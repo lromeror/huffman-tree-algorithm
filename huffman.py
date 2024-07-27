@@ -113,7 +113,7 @@ def decompress(input_bytes, reverse_mapping):
     encoded_text = remove_padding(bit_string)
     return decode_text(encoded_text, reverse_mapping)
 
-# Función para crear el gráfico del árbol
+
 def create_huffman_tree_graph(node, graph, pos=None, x=0, y=0, layer=1, parent=None):
     if pos is None:
         pos = {}
@@ -151,7 +151,6 @@ def decompress_file(input_file, output_file, reverse_mapping):
     with open(output_file, 'w') as file:
         file.write(decompressed_data)
 
-# Interfaz gráfica
 class HuffmanApp:
     def __init__(self, root):
         self.root = root
