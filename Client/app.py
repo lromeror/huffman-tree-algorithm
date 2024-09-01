@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, jsonify, send_file
 import os
 import requests
 import socket
@@ -64,11 +64,20 @@ def request_tree():
         response.raise_for_status()
 
         if response.status_code == 200:
+            with open('static/huffman_tree.png', 'wb') as f:
+                f.write(response.content)
             return render_template('index.html', tree_generated=True)
         else:
             return f"Error al generar el árbol de Huffman: {response.status_code} {response.text}", 500
     except requests.exceptions.RequestException as e:
         return f"Error al generar el árbol de Huffman: {e}", 500
+
+@app.route('/show_tree', methods=['GET'])
+def show_tree():
+    try:
+        return send_file('static/huffman_tree.png', mimetype='image/png')
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(port=5000, debug=True)  # Cliente escucha en el puerto 5000

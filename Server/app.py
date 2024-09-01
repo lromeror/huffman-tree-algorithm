@@ -17,7 +17,6 @@ app.config['UPLOAD_FOLDER'] = 'uploads'
 # Variable global para almacenar el texto descomprimido
 global_decompressed_text = ""
 
-# Ruta de inicio opcional
 @app.route('/')
 def home():
     return "Servidor de Huffman funcionando. Para subir archivos comprimidos, use la ruta /upload con una solicitud POST."
@@ -71,13 +70,12 @@ def draw_tree():
             draw_huffman_tree(root)
             plt.savefig('static/huffman_tree.png')
             plt.close()
-            return jsonify({"message": "Árbol de Huffman generado correctamente.", "image_url": "/download_tree"})
+            return send_file('static/huffman_tree.png', mimetype='image/png')
         else:
             return jsonify({"error": "No se pudo generar el árbol de Huffman."}), 500
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 @app.route('/download_tree', methods=['GET'])
 def download_tree():
@@ -87,5 +85,4 @@ def download_tree():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    # Escuchar en todas las interfaces con host='0.0.0.0'
     app.run(host='0.0.0.0', port=5001, debug=True)  # Servidor escucha en el puerto 5001
