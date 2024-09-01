@@ -1,5 +1,3 @@
-import tkinter as tk
-from tkinter import filedialog, messagebox
 import heapq
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -80,19 +78,27 @@ def get_byte_array(padded_encoded_text):
     return b
 
 def compress(text):
+    if not text: 
+        return bytearray(), {}, {} 
+
     frequency = calculate_frequency(text)
     heap = build_heap(frequency)
     heap = merge_nodes(heap)
+    
+    if not heap:
+        return bytearray(), {}, {}
+    
     codes, reverse_mapping = make_codes(heap)
     encoded_text = get_encoded_text(text, codes)
     padded_encoded_text = pad_encoded_text(encoded_text)
     return get_byte_array(padded_encoded_text), codes, reverse_mapping
 
+
 def remove_padding(padded_encoded_text):
     padded_info = padded_encoded_text[:8]
     extra_padding = int(padded_info, 2)
     padded_encoded_text = padded_encoded_text[8:]
-    encoded_text = padded_encoded_text[:-1 * extra_padding]
+    encoded_text = padded_encoded_text[:-extra_padding]
     return encoded_text
 
 def decode_text(encoded_text, reverse_mapping):
@@ -113,7 +119,7 @@ def decompress(input_bytes, reverse_mapping):
     encoded_text = remove_padding(bit_string)
     return decode_text(encoded_text, reverse_mapping)
 
-
+# Función para crear el gráfico del árbol
 def create_huffman_tree_graph(node, graph, pos=None, x=0, y=0, layer=1, parent=None):
     if pos is None:
         pos = {}
@@ -135,81 +141,3 @@ def draw_huffman_tree(root):
     plt.figure(figsize=(12, 8))
     nx.draw(graph, pos, labels=labels, with_labels=True, node_size=3000, node_color='lightblue', font_size=10, font_color='black', font_weight='bold', arrows=False)
     plt.show()
-
-def compress_file(input_file, output_file):
-    with open(input_file, 'r') as file:
-        text = file.read()
-    compressed_data, codes, reverse_mapping = compress(text)
-    with open(output_file, 'wb') as file:
-        file.write(bytes(compressed_data))
-    return codes, reverse_mapping
-
-def decompress_file(input_file, output_file, reverse_mapping):
-    with open(input_file, 'rb') as file:
-        input_bytes = file.read()
-    decompressed_data = decompress(input_bytes, reverse_mapping)
-    with open(output_file, 'w') as file:
-        file.write(decompressed_data)
-
-class HuffmanApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Compresión y Descompresión con Huffman")
-        self.file_path = None
-        self.codes = None
-        self.reverse_mapping = None
-
-        self.label = tk.Label(root, text="Seleccione un archivo para comprimir y descomprimir:")
-        self.label.pack(pady=10)
-
-        self.upload_button = tk.Button(root, text="Cargar Archivo", command=self.upload_file)
-        self.upload_button.pack(pady=5)
-
-        self.compress_button = tk.Button(root, text="Comprimir Archivo", command=self.compress_file)
-        self.compress_button.pack(pady=5)
-
-        self.decompress_button = tk.Button(root, text="Descomprimir Archivo", command=self.decompress_file)
-        self.decompress_button.pack(pady=5)
-
-    def upload_file(self):
-        self.file_path = filedialog.askopenfilename()
-        if self.file_path:
-            messagebox.showinfo("Archivo Cargado", f"Archivo cargado: {self.file_path}")
-        else:
-            messagebox.showwarning("Advertencia", "No se seleccionó ningún archivo")
-
-    def compress_file(self):
-        if not self.file_path:
-            messagebox.showwarning("Advertencia", "Primero debe cargar un archivo")
-            return
-
-        compressed_file = 'compressed.bin'
-        self.codes, self.reverse_mapping = compress_file(self.file_path, compressed_file)
-        original_size = os.path.getsize(self.file_path)
-        compressed_size = os.path.getsize(compressed_file)
-        messagebox.showinfo("Compresión Completa", f"Archivo comprimido guardado como {compressed_file}\n"
-                                                   f"Tamaño original: {original_size} bytes\n"
-                                                   f"Tamaño comprimido: {compressed_size} bytes")
-        self.draw_huffman_tree()
-
-    def decompress_file(self):
-        if not self.codes or not self.reverse_mapping:
-            messagebox.showwarning("Advertencia", "Primero debe comprimir un archivo")
-            return
-
-        compressed_file = 'compressed.bin'
-        decompressed_file = 'decompressed.txt'
-        decompress_file(compressed_file, decompressed_file, self.reverse_mapping)
-        messagebox.showinfo("Descompresión Completa", f"Archivo descomprimido guardado como {decompressed_file}")
-
-    def draw_huffman_tree(self):
-        frequency = calculate_frequency(open(self.file_path, 'r').read())
-        heap = build_heap(frequency)
-        heap = merge_nodes(heap)
-        root = heap[0]
-        draw_huffman_tree(root)
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = HuffmanApp(root)
-    root.mainloop()

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Compresión de Datos con Huffman - Cliente</title>
+</head>
+<body>
+    <h1>Compresión y Envío de Datos con Huffman</h1>
+
+    <!-- Formulario para subir un archivo o ingresar texto -->
+    <form action="/compress_and_send" method="post" enctype="multipart/form-data">
+        <label for="file">Sube un archivo de texto:</label>
+        <input type="file" name="file">
+        <br><br>
+        <label for="text">O introduce texto:</label>
+        <textarea name="text" rows="4" cols="50"></textarea>
+        <br><br>
+        <button type="submit">Comprimir y Enviar</button>
+    </form>
+
+    {% if result %}
+        <h2>Resultados de Compresión</h2>
+        <p>Tamaño Original: {{ result.original_size }} bytes</p>
+        <p>Tamaño Comprimido: {{ result.compressed_size }} bytes</p>
+        <p>Ratio de Compresión: {{ result.compression_ratio }}</p>
+    {% endif %}
+</body>
+</html>
