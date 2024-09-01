@@ -1,28 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Compresión de Datos con Huffman - Cliente</title>
+    <title>Compresión y Envío de Datos con Huffman</title>
 </head>
 <body>
     <h1>Compresión y Envío de Datos con Huffman</h1>
-
-    <!-- Formulario para subir un archivo o ingresar texto -->
     <form action="/compress_and_send" method="post" enctype="multipart/form-data">
         <label for="file">Sube un archivo de texto:</label>
-        <input type="file" name="file">
-        <br><br>
+        <input type="file" name="file"><br><br>
         <label for="text">O introduce texto:</label>
-        <textarea name="text" rows="4" cols="50"></textarea>
-        <br><br>
-        <button type="submit">Comprimir y Enviar</button>
+        <textarea name="text" rows="4" cols="50"></textarea><br><br>
+        <input type="submit" value="Comprimir y Enviar">
     </form>
 
     {% if result %}
-        <h2>Resultados de Compresión</h2>
-        <p>Tamaño Original: {{ result.original_size }} bytes</p>
-        <p>Tamaño Comprimido: {{ result.compressed_size }} bytes</p>
-        <p>Ratio de Compresión: {{ result.compression_ratio }}</p>
+    <h2>Resultados de Compresión</h2>
+    <p>Tamaño Original: {{ result.original_size }} bytes</p>
+    <p>Tamaño Comprimido: {{ result.compressed_size }} bytes</p>
+    <p>Ratio de Compresión: {{ result.compression_ratio }}</p>
+    
+    <form action="/request_tree" method="post">
+        <input type="submit" value="Dibujar Árbol de Huffman">
+    </form>
+    {% endif %}
+    
+    {% if tree_generated %}
+    <h2>Árbol de Huffman Generado</h2>
+    <a href="/download_tree">Descargar Imagen del Árbol de Huffman</a>
     {% endif %}
 </body>
 </html>

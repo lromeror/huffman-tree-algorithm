@@ -2,6 +2,7 @@ import heapq
 import networkx as nx
 import matplotlib.pyplot as plt
 import os
+plt.switch_backend('Agg')
 
 class Node:
     def __init__(self, char, freq):
