@@ -5,16 +5,14 @@ import json
 import matplotlib.pyplot as plt
 import networkx as nx
 
-# Agrega el directorio raíz del proyecto al sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-# Importa el módulo huffman después de ajustar sys.path
 from huffman import decompress, draw_huffman_tree, calculate_frequency, build_heap, merge_nodes
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['STATIC_FOLDER'] = 'static'
 
-# Variable global para almacenar el texto descomprimido
 global_decompressed_text = ""
 
 @app.route('/')
@@ -36,7 +34,7 @@ def upload_file():
 
     try:
         decompressed_text = decompress(compressed_data, reverse_mapping)
-        global_decompressed_text = decompressed_text  # Guardar para dibujar el árbol más tarde
+        global_decompressed_text = decompressed_text  
         
         # Calcular los tamaños
         compressed_size = len(compressed_data)
@@ -59,7 +57,7 @@ def draw_tree():
         if not global_decompressed_text:
             return jsonify({"error": "No hay texto descomprimido para dibujar el árbol."}), 400
 
-        # Generar y guardar el árbol de Huffman
+
         frequency = calculate_frequency(global_decompressed_text)
         heap = build_heap(frequency)
         heap = merge_nodes(heap)
@@ -68,9 +66,10 @@ def draw_tree():
         if root:
             plt.figure(figsize=(12, 8))
             draw_huffman_tree(root)
-            plt.savefig('static/huffman_tree.png')
+            tree_image_path = os.path.join(app.config['STATIC_FOLDER'], 'huffman_tree.png')
+            plt.savefig(tree_image_path)
             plt.close()
-            return send_file('static/huffman_tree.png', mimetype='image/png')
+            return send_file(tree_image_path, mimetype='image/png')
         else:
             return jsonify({"error": "No se pudo generar el árbol de Huffman."}), 500
     
@@ -80,9 +79,13 @@ def draw_tree():
 @app.route('/download_tree', methods=['GET'])
 def download_tree():
     try:
-        return send_file('static/huffman_tree.png', as_attachment=True)
+        tree_image_path = os.path.join(app.config['STATIC_FOLDER'], 'huffman_tree.png')
+        if os.path.exists(tree_image_path):
+            return send_file(tree_image_path, as_attachment=True)
+        else:
+            return jsonify({"error": "El archivo no existe en el servidor."}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5001, debug=True)  # Servidor escucha en el puerto 5001
+    app.run(host='0.0.0.0', port=5001, debug=True)  

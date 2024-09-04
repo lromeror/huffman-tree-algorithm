@@ -94,7 +94,6 @@ def compress(text):
     padded_encoded_text = pad_encoded_text(encoded_text)
     return get_byte_array(padded_encoded_text), codes, reverse_mapping
 
-
 def remove_padding(padded_encoded_text):
     padded_info = padded_encoded_text[:8]
     extra_padding = int(padded_info, 2)
@@ -120,7 +119,6 @@ def decompress(input_bytes, reverse_mapping):
     encoded_text = remove_padding(bit_string)
     return decode_text(encoded_text, reverse_mapping)
 
-# Función para crear el gráfico del árbol
 def create_huffman_tree_graph(node, graph, pos=None, x=0, y=0, layer=1, parent=None):
     if pos is None:
         pos = {}

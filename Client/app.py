@@ -5,19 +5,19 @@ import socket
 import sys
 import json
 
-# Agrega el directorio raíz del proyecto al sys.path
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from huffman import compress  # Importa desde el directorio raíz
+from huffman import compress 
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
-# Obtener la IP local de la máquina de forma automática
+
 hostname = socket.gethostname()
 local_ip = socket.gethostbyname(hostname)
-SERVER_URL = f'http://{local_ip}:5001/upload'  # Ruta para cargar y comprimir datos
-TREE_URL = f'http://{local_ip}:5001/draw_tree'  # Ruta para dibujar el árbol de Huffman
+SERVER_URL = f'http://{local_ip}:5001/upload'  
+TREE_URL = f'http://{local_ip}:5001/draw_tree' 
 
 @app.route('/')
 def index():
@@ -39,16 +39,14 @@ def compress_and_send():
     if not compressed_data:
         return "No hay datos para comprimir", 400
 
-    # Convertir reverse_mapping a una cadena JSON para enviar al servidor
     reverse_mapping_json = json.dumps(reverse_mapping)
 
-    # Enviar el archivo comprimido y el reverse_mapping al servidor
     try:
         response = requests.post(SERVER_URL, files={
             'file': ('compressed.bin', compressed_data),
             'reverse_mapping': ('reverse_mapping.json', reverse_mapping_json)
         })
-        response.raise_for_status()  # Lanza una excepción para códigos de error HTTP
+        response.raise_for_status() 
 
         if response.status_code == 200:
             return render_template('index.html', result=response.json())
@@ -75,9 +73,9 @@ def request_tree():
 @app.route('/show_tree', methods=['GET'])
 def show_tree():
     try:
-        return send_file('static/huffman_tree.png', mimetype='image/png')
+        return send_file('static/huffman_tree.png')
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(port=5000, debug=True)  # Cliente escucha en el puerto 5000
+    app.run(port=5000, debug=True) 
