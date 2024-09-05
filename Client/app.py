@@ -10,32 +10,39 @@ from huffman import compress
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
-SERVER_IP = '192.168.1.174'  # Cambia esto por la IP de tu servidor
+SERVER_IP = '192.168.1.174'  
 SERVER_URL = f'http://{SERVER_IP}:5001/upload'
-LIST_FILES_URL = f'http://{SERVER_IP}:5001/list_files'
 TREE_URL = f'http://{SERVER_IP}:5001/draw_tree'
+DOWNLOAD_COMPRESSED_URL = f'http://{SERVER_IP}:5001/download/compressed'
+DOWNLOAD_DECOMPRESSED_URL = f'http://{SERVER_IP}:5001/download/decompressed'
+LIST_FILES_URL = f'http://{SERVER_IP}:5001/list_files'
 
-@app.route('/')
-def index():
-    # Solicita la lista de archivos disponibles del servidor
+def get_file_lists():
+    """Función para obtener la lista de archivos comprimidos y descomprimidos."""
     try:
         response = requests.get(LIST_FILES_URL)
         response.raise_for_status()
-        files = response.json()
+        return response.json()
     except requests.exceptions.RequestException as e:
-        files = []
-        print(f"Error al obtener la lista de archivos: {e}")
-    
-    return render_template('index.html', files=files)
+        return {"error": str(e)}
+
+@app.route('/')
+def index():
+    files_data = get_file_lists() 
+    return render_template('index.html', 
+                           compressed_files=files_data.get('compressed_files', []), 
+                           decompressed_files=files_data.get('decompressed_files', []), 
+                           DOWNLOAD_COMPRESSED_URL=DOWNLOAD_COMPRESSED_URL, 
+                           DOWNLOAD_DECOMPRESSED_URL=DOWNLOAD_DECOMPRESSED_URL)
 
 @app.route('/compress_and_send', methods=['POST'])
 def compress_and_send():
     text = ""
     if 'file' in request.files and request.files['file'].filename != '':
         file = request.files['file']
-        text = file.read().decode('utf-8')
+        text = file.read().decode('utf-8') 
     elif 'text' in request.form and request.form['text'].strip() != '':
-        text = request.form['text']
+        text = request.form['text'] 
     else:
         return "No se proporcionó ni archivo ni texto", 400
 
@@ -47,7 +54,6 @@ def compress_and_send():
     reverse_mapping_json = json.dumps(reverse_mapping)
 
     try:
-        # Enviar datos comprimidos al servidor
         response = requests.post(SERVER_URL, files={
             'file': ('compressed.bin', compressed_data),
             'reverse_mapping': ('reverse_mapping.json', reverse_mapping_json)
@@ -56,21 +62,16 @@ def compress_and_send():
 
         if response.status_code == 200:
             compression_result = response.json()
-
-            # Obtener la lista de archivos del servidor después de la compresión
-            try:
-                list_response = requests.get(LIST_FILES_URL)
-                list_response.raise_for_status()
-                files = list_response.json()
-            except requests.exceptions.RequestException as e:
-                files = []
-                print(f"Error al obtener la lista de archivos después de la compresión: {e}")
-
-            return render_template('index.html', result=compression_result, files=files)
+            files_data = get_file_lists() 
+            return render_template('index.html', 
+                                   result=compression_result, 
+                                   compressed_files=files_data.get('compressed_files', []), 
+                                   decompressed_files=files_data.get('decompressed_files', []), 
+                                   DOWNLOAD_COMPRESSED_URL=DOWNLOAD_COMPRESSED_URL, 
+                                   DOWNLOAD_DECOMPRESSED_URL=DOWNLOAD_DECOMPRESSED_URL)
         else:
             return f"Error al enviar datos al servidor: {response.status_code} {response.text}", 500
     except requests.exceptions.RequestException as e:
-        print(f"Error al enviar datos al servidor: {e}")
         return f"Error al enviar datos al servidor: {e}", 500
 
 @app.route('/request_tree', methods=['POST'])
@@ -81,22 +82,17 @@ def request_tree():
 
         if response.status_code == 200:
             with open('static/huffman_tree.png', 'wb') as f:
-                f.write(response.content)
-            
-            # Obtener la lista de archivos del servidor
-            try:
-                list_response = requests.get(LIST_FILES_URL)
-                list_response.raise_for_status()
-                files = list_response.json()
-            except requests.exceptions.RequestException as e:
-                files = []
-                print(f"Error al obtener la lista de archivos después de la compresión: {e}")
-                
-            return render_template('index.html', tree_generated=True, files=files)
+                f.write(response.content)  
+            files_data = get_file_lists()  
+            return render_template('index.html', 
+                                   tree_generated=True, 
+                                   compressed_files=files_data.get('compressed_files', []), 
+                                   decompressed_files=files_data.get('decompressed_files', []), 
+                                   DOWNLOAD_COMPRESSED_URL=DOWNLOAD_COMPRESSED_URL, 
+                                   DOWNLOAD_DECOMPRESSED_URL=DOWNLOAD_DECOMPRESSED_URL)
         else:
             return f"Error al generar el árbol de Huffman: {response.status_code} {response.text}", 500
     except requests.exceptions.RequestException as e:
-        print(f"Error al generar el árbol de Huffman: {e}")
         return f"Error al generar el árbol de Huffman: {e}", 500
 
 @app.route('/show_tree', methods=['GET'])
@@ -104,7 +100,6 @@ def show_tree():
     try:
         return send_file('static/huffman_tree.png')
     except Exception as e:
-        print(f"Error al mostrar el árbol de Huffman: {e}")
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
