@@ -2,56 +2,160 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compresión y Envío de Datos con Huffman</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 1rem 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        label {
+            font-weight: bold;
+            color: #007bff;
+        }
+        input[type="file"], textarea {
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+        }
+        input[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        h2 {
+            color: #007bff;
+        }
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        .results, .files-section {
+            margin-top: 2rem;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            margin: 0.5rem 0;
+        }
+        ul li a {
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        ul li a:hover {
+            color: #0056b3;
+        }
+        img {
+            max-width: 100%;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        a.download-link {
+            display: inline-block;
+            background-color: #28a745;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        a.download-link:hover {
+            background-color: #218838;
+        }
+    </style>
 </head>
 <body>
-    <h1>Compresión y Envío de Datos con Huffman</h1>
+    <header>
+        <h1>Compresión y Envío de Datos con Huffman</h1>
+    </header>
 
-    <form action="/compress_and_send" method="post" enctype="multipart/form-data">
-        <label for="file">Sube un archivo de texto:</label>
-        <input type="file" name="file"><br><br>
+    <div class="container">
+        <form action="/compress_and_send" method="post" enctype="multipart/form-data">
+            <label for="file">Sube un archivo de texto:</label>
+            <input type="file" name="file">
 
-        <label for="text">O introduce texto:</label>
-        <textarea name="text" rows="4" cols="50"></textarea><br><br>
+            <label for="text">O introduce texto:</label>
+            <textarea name="text" rows="4" cols="50" placeholder="Escribe o pega aquí tu texto..."></textarea>
 
-        <input type="submit" value="Comprimir y Enviar">
-    </form>
+            <input type="submit" value="Comprimir y Enviar">
+        </form>
 
-    <!-- Mostrar resultados de la compresión -->
-    {% if result %}
-    <h2>Resultados de Compresión</h2>
-    <p>Tamaño Original: {{ result.original_size }} bytes</p>
-    <p>Tamaño Comprimido: {{ result.compressed_size }} bytes</p>
-    <p>Ratio de Compresión: {{ result.compression_ratio }}</p>
-    
-    <!-- Formulario para solicitar el árbol de Huffman -->
-    <form action="/request_tree" method="post">
-        <input type="submit" value="Dibujar Árbol de Huffman">
-    </form>
-    {% endif %}
-    
-    <!-- Mostrar el árbol de Huffman generado -->
-    {% if tree_generated %}
-    <h2>Árbol de Huffman Generado</h2>
-    <img src="/show_tree" alt="Árbol de Huffman"><br><br>
-    <a href="/download_tree" download="huffman_tree.png">Descargar Árbol</a>
-    {% endif %}
+        {% if result %}
+        <div class="results">
+            <h2>Resultados de Compresión</h2>
+            <p><strong>Tamaño Original:</strong> {{ result.original_size }} bytes</p>
+            <p><strong>Tamaño Comprimido:</strong> {{ result.compressed_size }} bytes</p>
+            <p><strong>Ratio de Compresión:</strong> {{ result.compression_ratio }}</p>
 
-    <!-- Mostrar archivos comprimidos disponibles para descargar -->
-    <h2>Archivos Comprimidos Disponibles para Descargar</h2>
-    <ul>
-        {% for file in compressed_files %}
-            <li><a href="{{ DOWNLOAD_COMPRESSED_URL }}/{{ file }}">{{ file }}</a></li>
-        {% endfor %}
-    </ul>
+            <form action="/request_tree" method="post">
+                <input type="submit" value="Dibujar Árbol de Huffman">
+            </form>
+        </div>
+        {% endif %}
 
-    <!-- Mostrar archivos descomprimidos disponibles para descargar -->
-    <h2>Archivos Descomprimidos Disponibles para Descargar</h2>
-    <ul>
-        {% for file in decompressed_files %}
-            <li><a href="{{ DOWNLOAD_DECOMPRESSED_URL }}/{{ file }}">{{ file }}</a></li>
-        {% endfor %}
-    </ul>
-    
+        {% if tree_generated %}
+        <div class="tree-section">
+            <h2>Árbol de Huffman Generado</h2>
+            <img src="/show_tree" alt="Árbol de Huffman">
+            <a href="/download_tree" download="huffman_tree.png" class="download-link">Descargar Árbol</a>
+        </div>
+        {% endif %}
+
+        <div class="files-section">
+            <h2>Archivos Comprimidos Disponibles para Descargar</h2>
+            <ul>
+                {% for file in compressed_files %}
+                    <li><a href="{{ DOWNLOAD_COMPRESSED_URL }}/{{ file }}">{{ file }}</a></li>
+                {% endfor %}
+            </ul>
+
+            <h2>Archivos Descomprimidos Disponibles para Descargar</h2>
+            <ul>
+                {% for file in decompressed_files %}
+                    <li><a href="{{ DOWNLOAD_DECOMPRESSED_URL }}/{{ file }}">{{ file }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 </body>
 </html>
