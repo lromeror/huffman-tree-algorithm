@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,16 +13,19 @@
             margin: 0;
             padding: 0;
         }
+
         header {
-            background-color: #007bff;
+            background-color: #2a5838;
             color: white;
             padding: 1rem 0;
             text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
         h1 {
             margin: 0;
         }
+
         .container {
             max-width: 1200px;
             margin: 2rem auto;
@@ -30,24 +34,29 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
         }
+
         form {
             display: flex;
             flex-direction: column;
             gap: 1rem;
             margin-bottom: 2rem;
         }
+
         label {
             font-weight: bold;
-            color: #007bff;
+            color: #2a5838;
         }
-        input[type="file"], textarea {
+
+        input[type="file"],
+        textarea {
             padding: 0.5rem;
             border: 1px solid #ccc;
             border-radius: 4px;
             width: 100%;
         }
+
         input[type="submit"] {
-            background-color: #007bff;
+            background-color: #2a5838;
             color: white;
             border: none;
             padding: 0.75rem;
@@ -56,40 +65,51 @@
             border-radius: 4px;
             transition: background-color 0.3s ease;
         }
+
         input[type="submit"]:hover {
-            background-color: #0056b3;
+            background-color: #144a24;
         }
+
         h2 {
-            color: #007bff;
+            color: #2a5838;
         }
+
         p {
             font-size: 1.1rem;
             line-height: 1.6;
         }
-        .results, .files-section {
+
+        .results,
+        .files-section {
             margin-top: 2rem;
         }
+
         ul {
             list-style-type: none;
             padding: 0;
         }
+
         ul li {
             margin: 0.5rem 0;
         }
+
         ul li a {
-            color: #007bff;
+            color: #2a5838;
             text-decoration: none;
             transition: color 0.3s ease;
         }
+
         ul li a:hover {
-            color: #0056b3;
+            color: #144a24;
         }
+
         img {
             max-width: 100%;
             border: 2px solid #ddd;
             border-radius: 8px;
             margin: 1rem 0;
         }
+
         a.download-link {
             display: inline-block;
             background-color: #28a745;
@@ -99,11 +119,13 @@
             text-decoration: none;
             transition: background-color 0.3s ease;
         }
+
         a.download-link:hover {
             background-color: #218838;
         }
     </style>
 </head>
+
 <body>
     <header>
         <h1>Compresión y Envío de Datos con Huffman</h1>
@@ -145,17 +167,18 @@
             <h2>Archivos Comprimidos Disponibles para Descargar</h2>
             <ul>
                 {% for file in compressed_files %}
-                    <li><a href="{{ DOWNLOAD_COMPRESSED_URL }}/{{ file }}">{{ file }}</a></li>
+                <li><a href="{{ DOWNLOAD_COMPRESSED_URL }}/{{ file }}">{{ file }}</a></li>
                 {% endfor %}
             </ul>
 
             <h2>Archivos Descomprimidos Disponibles para Descargar</h2>
             <ul>
                 {% for file in decompressed_files %}
-                    <li><a href="{{ DOWNLOAD_DECOMPRESSED_URL }}/{{ file }}">{{ file }}</a></li>
+                <li><a href="{{ DOWNLOAD_DECOMPRESSED_URL }}/{{ file }}">{{ file }}</a></li>
                 {% endfor %}
             </ul>
         </div>
     </div>
 </body>
+
 </html>

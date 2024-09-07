@@ -138,5 +138,5 @@ def draw_huffman_tree(root):
     graph, pos = create_huffman_tree_graph(root, graph)
     labels = {node: f'{node.char}\nFreq: {node.freq}' if node.char else f'Freq: {node.freq}' for node in graph.nodes()}
     plt.figure(figsize=(12, 8))
-    nx.draw(graph, pos, labels=labels, with_labels=True, node_size=3000, node_color='lightblue', font_size=10, font_color='black', font_weight='bold', arrows=False)
+    nx.draw(graph, pos, labels=labels, with_labels=True, node_size=3000, node_color='lightgreen', font_size=10, font_color='black', font_weight='bold', arrows=False)
     plt.show()
